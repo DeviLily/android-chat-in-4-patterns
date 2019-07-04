@@ -14,11 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lombok.extern.java.Log;
 import nju.androidchat.client.ClientMessage;
 import nju.androidchat.client.R;
 import nju.androidchat.client.Utils;
+import nju.androidchat.client.component.ItemImageReceive;
+import nju.androidchat.client.component.ItemImageSend;
 import nju.androidchat.client.component.ItemTextReceive;
 import nju.androidchat.client.component.ItemTextSend;
 import nju.androidchat.client.component.OnRecallMessageRequested;
@@ -50,17 +54,38 @@ public class Hw1TalkActivity extends AppCompatActivity implements Hw1Contract.Vi
         runOnUiThread(() -> {
                     LinearLayout content = findViewById(R.id.chat_content);
 
-                    // 删除所有已有的ItemText
-                    content.removeAllViews();
+//                    // 删除所有已有的ItemText
+//                    content.removeAllViews();
+//
+//                    // 增加ItemText
+//                    for (ClientMessage message : messages) {
+//                        String text = String.format("%s", message.getMessage());
+//                        // 如果是自己发的，增加ItemTextSend
+//                        if (message.getSenderUsername().equals(this.presenter.getUsername())) {
+//                            content.addView(new ItemTextSend(this, text, message.getMessageId(), this));
+//                        } else {
+//                            content.addView(new ItemTextReceive(this, text, message.getMessageId()));
+//                        }
+//                    }
 
-                    // 增加ItemText
-                    for (ClientMessage message : messages) {
+                    // 只加入新消息，否则会导致图片重复加载
+                    for (int i = content.getChildCount(); i < messages.size(); ++i) {
+                        ClientMessage message = messages.get(i);
                         String text = String.format("%s", message.getMessage());
-                        // 如果是自己发的，增加ItemTextSend
+                        Pattern pattern = Pattern.compile("^!\\[[^]]*\\]\\((.?)\\)$");
+                        Matcher matcher = pattern.matcher(text);
+                        boolean isImage = matcher.find();
+                        String url = isImage ? matcher.group(1) : null;
                         if (message.getSenderUsername().equals(this.presenter.getUsername())) {
-                            content.addView(new ItemTextSend(this, text, message.getMessageId(), this));
+                            if (isImage)
+                                content.addView(new ItemImageSend(this, url, message.getMessageId(), this));
+                            else
+                                content.addView(new ItemTextSend(this, text, message.getMessageId(), this));
                         } else {
-                            content.addView(new ItemTextReceive(this, text, message.getMessageId()));
+                            if (isImage)
+                                content.addView(new ItemImageReceive(this, url, message.getMessageId()));
+                            else
+                                content.addView(new ItemTextReceive(this, text, message.getMessageId()));
                         }
                     }
 
