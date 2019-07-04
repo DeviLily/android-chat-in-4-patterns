@@ -1,6 +1,8 @@
 package nju.androidchat.client;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -8,6 +10,9 @@ import android.widget.ScrollView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -61,4 +66,16 @@ public class Utils {
         return content.contains("fuck");
     }
 
+    public Bitmap getNetworkImage(String urlStr) {
+        Bitmap bm = null;
+        try {
+            URL url = new URL(urlStr);
+            InputStream is = url.openConnection().getInputStream();
+            bm = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bm;
+    }
 }
