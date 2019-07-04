@@ -72,7 +72,7 @@ public class Hw1TalkActivity extends AppCompatActivity implements Hw1Contract.Vi
                     for (int i = content.getChildCount(); i < messages.size(); ++i) {
                         ClientMessage message = messages.get(i);
                         String text = String.format("%s", message.getMessage());
-                        Pattern pattern = Pattern.compile("^!\\[[^]]*\\]\\((.?)\\)$");
+                        Pattern pattern = Pattern.compile("^!\\[.*?\\]\\((.*?)\\)$");
                         Matcher matcher = pattern.matcher(text);
                         boolean isImage = matcher.find();
                         String url = isImage ? matcher.group(1) : null;

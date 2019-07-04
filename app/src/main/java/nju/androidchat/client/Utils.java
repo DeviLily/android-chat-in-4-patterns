@@ -67,15 +67,23 @@ public class Utils {
     }
 
     public Bitmap getNetworkImage(String urlStr) {
-        Bitmap bm = null;
+        final Bitmap[] bm = {null};
+        Thread thread = new Thread(() -> {
+            try {
+                URL url = new URL(urlStr);
+                InputStream is = url.openConnection().getInputStream();
+                bm[0] = BitmapFactory.decodeStream(is);
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
         try {
-            URL url = new URL(urlStr);
-            InputStream is = url.openConnection().getInputStream();
-            bm = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
+            thread.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return bm;
+        return bm[0];
     }
 }
